@@ -3,7 +3,6 @@ console.log("hey, js has loaded!");
 // Convert HTML elements to JS objects
 let startElem = document.getElementById("start");
 let messageElem = document.getElementById("message");
-let guessElem = document.getElementById("guess");
 let gridElem = document.getElementById("grid");
 
 // Set up event listener to generate the grid.
@@ -19,9 +18,6 @@ let gridCells = [];
 
 function generateGrid () {
     console.log("generateGrid entered")
-
-    // Allow for the cells to be guessed, after the cell has been generated.
-    guessElem.addEventListener("click", guessCell);
 
     // First, get the values that were submitted by the user.
     let difficultyLevel = document.getElementById("difficulty").value;
@@ -58,7 +54,17 @@ function generateGrid () {
 
             // Create event listener for the button that was generated.
             para.addEventListener("click", guessCell);
+
+            // Create an event listener for the right click of the button that was gernated.
+            
         }
+        // After each row, create a paragraph so that it will go to the next row.
+        let para = document.createElement("p");
+        let node = document.createTextNode("");
+        para.appendChild(node);
+        let element = document.getElementById("grid");
+        element.appendChild(para);
+
     }
 
     // Populate the cells that don't have bombs (not 'X') with how many bombs they border.
@@ -68,7 +74,6 @@ function generateGrid () {
         }
     }
     console.log(gridCells);
-    messageElem.textContent = displayGrid(gridCells);
 }
 
 function guessCell () {
@@ -79,21 +84,21 @@ function guessCell () {
     let cellArray = cellID.split(" "); // The ID has the form of Row Number " " Column Number.
 
     // First, get the Row and Column values that were entered by the user.
-    let rowGuess = cellArray[0]; // subtract 1 since grid starts at 0
-    let columnGuess = cellArray[1];
+    let rowGuess = parseInt(cellArray[0]); // subtract 1 since grid starts at 0
+    let columnGuess = parseInt(cellArray[1]);
     console.log("Row is " + rowGuess + ", Column is " + columnGuess);
 
     if (gridCells[rowGuess][columnGuess]==='X') {//If they lose
         // Set a message saying that they lose
         messageElem.textContent = "You lose!";
-
-        // You can't guess after you lose, until you re-generate.
-        guessElem.removeEventListener("click", guessCell);
     } else {
         // Mark the cell as being selected.
         gridCells[rowGuess][columnGuess]='Y';
         console.log(gridCells);
-        messageElem.textContent = displayGrid(gridCells);
+
+        // Visually display the number on the cell.
+        let cellNum = determineCellNumber(gridCells, rowGuess, columnGuess);
+        document.getElementById(cellID).innerText = cellNum;
 
         // Determine the number of unguessed cells left that do not have bombs.
         gridTotal = sumGrid(gridCells);
@@ -102,9 +107,6 @@ function guessCell () {
         if (gridTotal === 0) { // If they win
             // Set a message saying that they lose
         messageElem.textContent = "You win!";
-
-        // You can't guess after you win, until you re-generate.
-        guessElem.removeEventListener("click", guessCell);
         }
     }
 }
