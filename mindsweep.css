@@ -1,3 +1,8 @@
+:root {
+  --numCols: 3;
+  --numRows: 2;
+}
+
 body {
     text-align: center;
     font-family: Helvetica, Verdana, sans-serif;
@@ -23,5 +28,11 @@ body {
     margin: 2.5em 0;
   }
 
-  
+  .wrapper {
+    display: grid;
+    grid-template-columns: repeat(var(--numCols), 25px);
+    grid-template-rows: repeat(var(--numRows), 25px);
+    grid-gap: 0px;
+    justify-content: center;
+  }
   

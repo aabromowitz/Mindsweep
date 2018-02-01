@@ -8,10 +8,6 @@ let gridElem = document.getElementById("grid");
 // Set up event listener to generate the grid.
 startElem.addEventListener("click", generateGrid);
 
-function test () {
-    console.log("test" + this.id);
-}
-
 // Create an object that is a grid.
 // It is created outside of the generateGrid function so that it can be referenced in other functions.
 let gridCells = [];
@@ -26,6 +22,10 @@ function generateGrid () {
     console.log("Level of difficulty is " + difficultyLevel);
     console.log("gridHeight is " + gridHeight);
     console.log("gridWidth is " + gridWidth);
+
+    // Updating the CSS Grid values.
+    document.documentElement.style.setProperty('--numCols', gridHeight);
+    document.documentElement.style.setProperty('--numRows', gridWidth);
 
     // Output the user's input as text (will become an actual grid later).
     messageElem.textContent = "You chose " + difficultyLevel + " level of difficulty";
@@ -56,14 +56,8 @@ function generateGrid () {
             para.addEventListener("click", guessCell);
 
             // Create an event listener for the right click of the button that was gernated.
-            
+            para.addEventListener("contextmenu", turnCellRed);
         }
-        // After each row, create a paragraph so that it will go to the next row.
-        let para = document.createElement("p");
-        let node = document.createTextNode("");
-        para.appendChild(node);
-        let element = document.getElementById("grid");
-        element.appendChild(para);
 
     }
 
@@ -149,6 +143,13 @@ function determineCellNumber (array, row, column) {
         bombCount = 'X';
     }
     return bombCount;
+}
+
+function turnCellRed (event) {
+    this.style.color = "red";
+
+    // Prevent right-clicking from opening up the menu.
+    event.preventDefault();
 }
 
 function isBomb (arrayValue) {
