@@ -83,24 +83,37 @@ function guessCell () {
     console.log("Row is " + rowGuess + ", Column is " + columnGuess);
 
     if (gridCells[rowGuess][columnGuess]==='X') {//If they lose
-        // Set a message saying that they lose
-        messageElem.textContent = "You lose!";
+        if (countYs(gridCells) === 0) { // If it's their first turn, don't allow them to lose
+            gridCells[rowGuess][columnGuess] = 'Y';
+            cascadeZeros(gridCells, rowGuess, columnGuess);
+        } else {
+            // Set a message saying that they lose
+            messageElem.textContent = "You lose!";
+
+            // Remove event listeners.
+            clearButtonListeners(gridCells);
+        }
     } else {
         // Mark the cell as being selected.
         gridCells[rowGuess][columnGuess]='Y';
-        console.log(gridCells);
 
         // Visually display the number on the cell.
-        let cellNum = determineCellNumber(gridCells, rowGuess, columnGuess);
-        document.getElementById(cellID).innerText = cellNum;
+        //let cellNum = determineCellNumber(gridCells, rowGuess, columnGuess);
+        //document.getElementById(cellID).innerText = cellNum;
+
+        // If the Cell number is 0, automatically select all cells around it.
+        // This also will display the number on the cell.
+        cascadeZeros(gridCells, rowGuess, columnGuess);
 
         // Determine the number of unguessed cells left that do not have bombs.
         gridTotal = sumGrid(gridCells);
-        console.log(gridTotal);
 
         if (gridTotal === 0) { // If they win
             // Set a message saying that they lose
-        messageElem.textContent = "You win!";
+            messageElem.textContent = "You win!";
+
+            // Remove event listeners.
+            clearButtonListeners(gridCells);
         }
     }
 }
@@ -146,8 +159,12 @@ function determineCellNumber (array, row, column) {
 }
 
 function turnCellRed (event) {
-    this.style.color = "red";
-
+    if (this.style.color === "red") {
+        this.style.color = "black";
+    } else {
+        this.style.color = "red";
+    }
+    
     // Prevent right-clicking from opening up the menu.
     event.preventDefault();
 }
@@ -203,4 +220,70 @@ function displayGrid (array) {
         text = text + "\n";
     }
     return text; 
+}
+
+function clearButtonListeners(array){
+    let arrayWidth = array.length;
+    let arrayHeight = array[0].length;
+    for (let i=0; i<arrayHeight; i++) {
+        for (let j=0; j<arrayWidth; j++) {
+            let gridID = i + " " + j;
+            let buttonElem = document.getElementById(gridID);
+            buttonElem.removeEventListener("click", guessCell);
+        }
+    }
+}
+
+function cascadeZeros(array, row, column) {
+    let arrayWidth = array.length;
+    let arrayHeight = array[0].length;
+
+    // Fill out the cell number.
+    let cellNum = determineCellNumber(gridCells, row, column);
+    let cellID = row + " " + column;
+    let cellDisplay = document.getElementById(cellID).innerText;
+    document.getElementById(cellID).innerText = cellNum;
+    gridCells[row][column] = 'Y';
+    if(cellNum===0 && cellDisplay === "+") { // 0 indicates that you should fill out the cell's neighbors, 
+    // any other number means don't do anything
+
+        if(row > 0) {
+            cascadeZeros(array, row-1, column); //below
+            if(column > 0) {
+                cascadeZeros(array, row-1, column-1);//below left  
+            } 
+            if (column < arrayWidth-1) {
+                cascadeZeros(array, row-1, column+1);//below right
+            }
+        } 
+        if (row < arrayHeight - 1) {
+            cascadeZeros(array, row+1, column); //above
+            if (column > 0) {
+                cascadeZeros(array, row+1, column-1);//above left
+            } 
+            if (column < arrayWidth-1) {
+                cascadeZeros(array, row+1, column+1);//above right 
+            }
+        }
+        if (column > 0) {
+            cascadeZeros(array, row, column-1);//left
+        } 
+        if (column < arrayWidth-1) {
+            cascadeZeros(array, row, column+1);//right
+        }
+    } 
+}
+
+function countYs (array) {
+    let total = 0;
+    let arrayWidth = array.length;
+    let arrayHeight = array[0].length;
+    for (let i=0; i<arrayHeight; i++) {
+        for (let j=0; j<arrayWidth; j++) {
+            if (array[i][j] === 'Y') {
+                total = total + 1;
+            }
+        }
+    } 
+    return total;
 }
