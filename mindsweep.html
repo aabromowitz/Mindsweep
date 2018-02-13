@@ -9,6 +9,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <link rel="stylesheet" href="mindsweep.css">
+
+    <script src="https://www.gstatic.com/firebasejs/4.8.2/firebase.js" defer></script>
     <script src="mindsweep.js" defer></script>    
   </head>
   
@@ -30,6 +32,12 @@
       <br/>
       <label for="colNum">Number of Columns: </label>
       <input type="text" id="colNum"> <br/>
+      <br/>
+      <label for="name">Name: </label>
+      <input type="text" id="name" readonly> <br/>
+      <br/>
+      <label for="wins">Wins: </label>
+      <input type="text" id="wins" readonly> <br/>
       <br/>
       <input type="button" id="start" value="Start"><br/><br/>
     
